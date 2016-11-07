@@ -1,10 +1,21 @@
 #include "SDL\SDL.h"
+#include "enet\enet.h"
 #include <iostream>
 #include <string>
 
 
 int main(int argc, char* argv[])
 {
+
+	if (enet_initialize() != 0)
+	{
+		std::cout << "fug" << std::endl;
+	}
+
+	ENetHost *entti;
+	entti = enet_host_create(NULL, 1, 2, 0, 0);
+	
+
 	// SDL_Init initializes specified subsystems, returns 0 if successful. 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
@@ -55,7 +66,8 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	for (int i = 0; i < 3; ++i){
+	for (int i = 0; i < 3; ++i)
+	{
 		//First clear the renderer
 		SDL_RenderClear(ren);
 		//Draw the texture
@@ -65,6 +77,10 @@ int main(int argc, char* argv[])
 		//Take a quick break after all that hard work
 		SDL_Delay(1000);
 	}
+
+	enet_host_destroy(entti);
+
+	enet_deinitialize();
 
 	SDL_DestroyTexture(tex);
 	SDL_DestroyRenderer(ren);
