@@ -8,8 +8,6 @@ int main(int argc, char *argv[])
 	{
 		return 0;
 	}
-	
-
 
 	ENetAddress adder;
 
@@ -23,6 +21,7 @@ int main(int argc, char *argv[])
 	{
 		while (enet_host_service(servu, &event, 0) > 0)
 		{
+			// Handle ENet events and inbound packets first on every frame.
 			switch (event.type)
 			{
 			case ENET_EVENT_TYPE_CONNECT:
@@ -50,8 +49,15 @@ int main(int argc, char *argv[])
 				break;
 			}
 		}
+
+		// Rest of the game loop. 
+
+
+		
+
+
 	}
-	
+
 	enet_deinitialize();
 
 	return 0;

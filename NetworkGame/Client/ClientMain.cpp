@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 
 	ENetHost *entti;
 	entti = enet_host_create(NULL, 1, 2, 0, 0);
-	
+
 
 	// SDL_Init initializes specified subsystems, returns 0 if successful. 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
