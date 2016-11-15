@@ -2,10 +2,8 @@
 class ServerGame
 {
 public:
-	ServerGame();
-	~ServerGame();
-
 	void run();
+private:
 
 };
 
