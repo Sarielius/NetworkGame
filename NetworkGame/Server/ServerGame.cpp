@@ -1,8 +1,5 @@
 #include "ServerGame.h"
 
-#include <stdio.h>
-#include <math.h>
-
 #include "enet\enet.h"
 
 #include "SFML\Graphics.hpp"
@@ -26,12 +23,26 @@ void ServerGame::run()
 	ENetHost *servu = enet_host_create(&adder, 32, 2, 0, 0);
 	ENetEvent event;
 
-	// SFML Init
+	sf::RenderWindow window(sf::VideoMode(screenX, screenY), "NetworkGame");
+	
+	// Other initializations.
+	sf::CircleShape background(300.f, 60);
+	background.setFillColor(sf::Color::Green);
+	background.setOrigin(background.getRadius(), background.getRadius());
+	background.setPosition(screenX / 2, screenY / 2);
 
-	sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
-	sf::CircleShape shape(100.f);
-	shape.setFillColor(sf::Color::Green);
+	Player* player = new Player();
+	player->getShape().setPosition(screenX*.25f, screenY / 2);
+	InputHandler* handler = new InputHandler(player);
 
+	playerContainer.push_back(player);
+
+	Player* dummy = new Player();
+	dummy->getShape().setPosition(screenX*.75f, screenY/2);
+	dummy->getShape().setFillColor(sf::Color::Red);
+
+	playerContainer.push_back(dummy);
+	
 
 	while (running)
 	{
@@ -79,14 +90,30 @@ void ServerGame::run()
 			}
 		}
 
+		handler->update();
+
 		window.clear();
-		window.draw(shape);
+		window.draw(background);
+
+		for (auto &player : playerContainer)
+		{
+			player->update();
+			player->draw(window);
+		}
+
 		window.display();
 		
 		//running = false;
 
 	}
 	
+	for (auto &player : playerContainer)
+	{
+		delete player;
+	}
+
+	playerContainer.clear();
+	delete handler;
 
 	enet_deinitialize();
 }
