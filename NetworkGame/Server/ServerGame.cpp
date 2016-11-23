@@ -90,8 +90,6 @@ void ServerGame::run()
 			}
 		}
 
-		handler->update();
-
 		window.clear();
 		window.draw(background);
 
@@ -103,6 +101,7 @@ void ServerGame::run()
 
 		window.display();
 		
+		handler->update();
 		//running = false;
 
 	}

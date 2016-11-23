@@ -8,55 +8,31 @@ InputHandler::InputHandler(Player* player)
 	speed = 0.05f;
 }
 
-void InputHandler::update() // Children, avert thine eyes.
+void InputHandler::update()
 {
-	// PSEUDOA
-	// bool w, a, s ,d = false;
-	// if (is pressed (a))
-	// {
-	//		a = true;
-	// }
-	//  
-	// HANDLING
-	// if ( a && w )
-	// if ( a && !w && !s)
-	
-	// How to not hax?
+	moveVec = { 0, 0 };
 
 	pos = owner->getShape().getPosition();
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && !sf::Keyboard::isKeyPressed(sf::Keyboard::W) && !sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		owner->getShape().setPosition(pos.x - speed, pos.y);
+		moveVec.y -= speed;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && !sf::Keyboard::isKeyPressed(sf::Keyboard::W) && !sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		owner->getShape().setPosition(pos.x + speed, pos.y);
+		moveVec.x -= speed;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && !sf::Keyboard::isKeyPressed(sf::Keyboard::A) && !sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		owner->getShape().setPosition(pos.x, pos.y + speed);
+		moveVec.y += speed;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && !sf::Keyboard::isKeyPressed(sf::Keyboard::A) && !sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		owner->getShape().setPosition(pos.x, pos.y - speed);
-	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-	{
-		owner->getShape().setPosition(pos.x - speed, pos.y + speed);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-	{
-		owner->getShape().setPosition(pos.x - speed, pos.y - speed);
+		moveVec.x += speed;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-	{
-		owner->getShape().setPosition(pos.x + speed, pos.y + speed);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-	{
-		owner->getShape().setPosition(pos.x + speed, pos.y - speed);
-	}
+	pos += moveVec;
+
+	owner->getShape().setPosition(pos.x, pos.y);
+
 }
