@@ -1,8 +1,28 @@
 #include "ServerGame.h"
 
 #include "enet\enet.h"
-
 #include "SFML\Graphics.hpp"
+
+#include <stdio.h>
+#include <stdlib.h>
+
+/////////////// THE GRAND LIST OF TODO ///////////////
+/*
+	_GAME_
+	Mouse tracking and shape rotation.
+	Weapon mechanics
+	Death
+	Points
+	Graphics, as in player, arena and background textures.
+
+	_NETWORK_
+	Everything xd
+	Connection
+	Serialization
+	Packet send rate and client/server update rate
+
+*/
+
 
 void ServerGame::run()
 {
@@ -26,18 +46,19 @@ void ServerGame::run()
 	sf::RenderWindow window(sf::VideoMode(screenX, screenY), "NetworkGame");
 	
 	// Other initializations.
-	sf::CircleShape background(300.f, 60);
-	background.setFillColor(sf::Color::Green);
-	background.setOrigin(background.getRadius(), background.getRadius());
-	background.setPosition(screenX / 2, screenY / 2);
+	arenaShape.setRadius(300.f);
+	arenaShape.setPointCount(60);
+	arenaShape.setFillColor(sf::Color::Green);
+	arenaShape.setOrigin(arenaShape.getRadius(), arenaShape.getRadius());
+	arenaShape.setPosition(screenX / 2, screenY / 2);
 
-	Player* player = new Player();
+	Player* player = new Player(playerCount++);
 	player->getShape().setPosition(screenX*.25f, screenY / 2);
 	InputHandler* handler = new InputHandler(player);
 
 	playerContainer.push_back(player);
 
-	Player* dummy = new Player();
+	Player* dummy = new Player(playerCount++);
 	dummy->getShape().setPosition(screenX*.75f, screenY/2);
 	dummy->getShape().setFillColor(sf::Color::Red);
 
@@ -91,7 +112,7 @@ void ServerGame::run()
 		}
 
 		window.clear();
-		window.draw(background);
+		window.draw(arenaShape);
 
 		for (auto &player : playerContainer)
 		{
@@ -100,10 +121,10 @@ void ServerGame::run()
 		}
 
 		window.display();
-		
-		handler->update();
-		//running = false;
 
+		updateState();
+
+		handler->update();
 	}
 	
 	for (auto &player : playerContainer)
@@ -115,4 +136,25 @@ void ServerGame::run()
 	delete handler;
 
 	enet_deinitialize();
+}
+
+void ServerGame::updateState()
+{
+	float distance;
+	sf::Vector2f playerPos; // Player position
+	sf::Vector2f arenaPos = arenaShape.getPosition();
+
+	for (auto &player : playerContainer)
+	{
+		playerPos = player->getShape().getPosition();
+
+		distance = sqrt((playerPos.x - arenaPos.x) * (playerPos.x - arenaPos.x) + (playerPos.y - arenaPos.y) * (playerPos.y - arenaPos.y));
+		
+		if (distance > (arenaShape.getRadius() + player->getShape().getRadius()))
+		{
+			// Kill player
+
+			printf("Player ID:%d out of range!\n", player->getId());
+		}
+	}
 }

@@ -12,22 +12,18 @@ public:
 	{
 		// SFML Init
 		screenX = 800;
-		screenY = 800;
-
-		
+		screenY = 800;	
 	}
 
 	~ServerGame()
-	{
-
-	}
+	{}
 
 	void run();
+	void updateState();
+
 private:
-
-	int screenX, screenY;
-	
+	int screenX, screenY, playerCount;
 	std::vector<Player*> playerContainer;
-
+	sf::CircleShape arenaShape;
 };
 

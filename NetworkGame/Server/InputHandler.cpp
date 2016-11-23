@@ -5,7 +5,7 @@
 InputHandler::InputHandler(Player* player)
 {
 	owner = player;
-	speed = 0.05f;
+	speed = 0.025f;
 }
 
 void InputHandler::update()
@@ -30,8 +30,16 @@ void InputHandler::update()
 	{
 		moveVec.x += speed;
 	}
-
-	pos += moveVec;
+	
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+	{
+		pos += moveVec * 1.5f;
+	}
+	else
+	{
+		pos += moveVec;
+	}
+	
 
 	owner->getShape().setPosition(pos.x, pos.y);
 
