@@ -5,6 +5,13 @@
 #include "Player.h"
 #include "InputHandler.h"
 
+struct Score
+{
+	int player1 = 0;
+	int player2 = 0;
+};
+
+
 class ServerGame
 {
 public:
@@ -20,10 +27,13 @@ public:
 
 	void run();
 	void updateState();
+	void reset();
 
 private:
-	int screenX, screenY, playerCount;
+	int screenX, screenY;
+	Score score;
 	std::vector<Player*> playerContainer;
+	std::vector<InputHandler*> handlers;
 	sf::CircleShape arenaShape;
 };
 
