@@ -7,7 +7,7 @@ class InputHandler
 {
 public:
 	InputHandler(Player* player);
-	void update(const sf::Time& elapsed);
+	void update(const sf::Time& elapsed, sf::RenderWindow& win);
 private:
 	sf::Vector2f pos;
 	sf::Vector2f moveVec;

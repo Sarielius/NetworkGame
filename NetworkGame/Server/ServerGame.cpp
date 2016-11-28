@@ -115,7 +115,7 @@ void ServerGame::run()
 
 		for (auto &handler : handlers)
 		{
-			handler->update(elapsed);
+			handler->update(elapsed, window);
 		}
 
 		elapsed = clock.restart();
