@@ -45,12 +45,20 @@ void ServerGame::run()
 	sf::RenderWindow window(sf::VideoMode(screenX, screenY), "NetworkGame");
 	sf::Clock clock;
 	sf::Time elapsed = clock.getElapsedTime();
+
 	// Other initializations.
 	arenaShape.setRadius(300.f);
 	arenaShape.setPointCount(60);
-	arenaShape.setFillColor(sf::Color::Green);
+	arenaShape.setFillColor(sf::Color::White);
 	arenaShape.setOrigin(arenaShape.getRadius(), arenaShape.getRadius());
 	arenaShape.setPosition(screenX / 2, screenY / 2);
+	
+	if (!arenaTex.loadFromFile("../Assets/arena.png"))
+	{
+		printf("Arena texture loading failed!");
+	}
+
+	arenaShape.setTexture(&arenaTex);
 
 	reset();
 	
@@ -213,7 +221,6 @@ void ServerGame::reset()
 
 	Player* player2 = new Player(1);
 	player2->getShape().setPosition(screenX*.75f, screenY / 2);
-	player2->getShape().setFillColor(sf::Color::Red);
 
 	//InputHandler* handler2 = new InputHandler(player2);
 

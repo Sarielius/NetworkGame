@@ -35,5 +35,6 @@ private:
 	std::vector<Player*> playerContainer;
 	std::vector<InputHandler*> handlers;
 	sf::CircleShape arenaShape;
+	sf::Texture arenaTex;
 };
 

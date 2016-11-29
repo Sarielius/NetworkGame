@@ -50,22 +50,18 @@ void InputHandler::update(const sf::Time& elapsed, sf::RenderWindow& win)
 	sf::Vector2i mousePos = sf::Mouse::getPosition(win);
 	sf::Vector2f playerPos = owner->getShape().getPosition();
 
-	float playerToMouseVec = sqrt(((playerPos.x - mousePos.x) * (playerPos.x - mousePos.x)) + 
-		((playerPos.y - mousePos.y) * (playerPos.y - mousePos.y)));
-	float originToPlayerVec = sqrt((playerPos.x * playerPos.x) + (playerPos.y * playerPos.y));
+	float angle3 = atan2f((mousePos.y - playerPos.y), (mousePos.x - playerPos.x));
 
-	angle = atan2f(originToPlayerVec, playerToMouseVec);
+	angle3 *= RADTODEG;
 
-	float angleDeg = angle * RADTODEG;
+	if (angle3 < 0)
+	{
+		angle3 = 360 - (-angle3);
+	}
 
-	float angle2 = atanf((mousePos.x - playerPos.x) / (mousePos.y - playerPos.y));
-	
-	//printf("Angle: %f\n", angle2);
-
-	angle2 *= angle2 * RADTODEG;
-
-	//printf("AngleDeg: %f\n", angle2);
+	//printf("Angle: %f\n", angle3);
 
 	owner->getShape().setPosition(pos.x, pos.y);
+	owner->getShape().setRotation(angle3);
 
 }
