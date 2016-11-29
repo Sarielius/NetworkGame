@@ -2,6 +2,10 @@
 #include "SFML\Graphics.hpp"
 #include "Player.h"
 #include <math.h>
+
+#define DEGTORAD 0.0174532925199432957f
+#define RADTODEG 57.295779513082320876f
+
 InputHandler::InputHandler(Player* player)
 {
 	owner = player;
@@ -46,12 +50,21 @@ void InputHandler::update(const sf::Time& elapsed, sf::RenderWindow& win)
 	sf::Vector2i mousePos = sf::Mouse::getPosition(win);
 	sf::Vector2f playerPos = owner->getShape().getPosition();
 
-	float mouseVec = sqrt((mousePos.x*mousePos.x) + (mousePos.y * mousePos.y));
-	float playerVec = sqrt((playerPos.x * playerPos.x) + (playerPos.y * playerPos.y));
+	float playerToMouseVec = sqrt(((playerPos.x - mousePos.x) * (playerPos.x - mousePos.x)) + 
+		((playerPos.y - mousePos.y) * (playerPos.y - mousePos.y)));
+	float originToPlayerVec = sqrt((playerPos.x * playerPos.x) + (playerPos.y * playerPos.y));
 
-	angle = atan2f(mouseVec, playerVec);
+	angle = atan2f(originToPlayerVec, playerToMouseVec);
 
-	// printf("\nAngle: %f\n", angle);
+	float angleDeg = angle * RADTODEG;
+
+	float angle2 = atanf((mousePos.x - playerPos.x) / (mousePos.y - playerPos.y));
+	
+	//printf("Angle: %f\n", angle2);
+
+	angle2 *= angle2 * RADTODEG;
+
+	//printf("AngleDeg: %f\n", angle2);
 
 	owner->getShape().setPosition(pos.x, pos.y);
 

@@ -22,6 +22,8 @@ public:
 	}
 
 private:
+	sf::Sprite sprite;
+	sf::Texture tex;
 	sf::CircleShape shape;
 	int id;
 };

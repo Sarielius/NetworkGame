@@ -152,7 +152,8 @@ void ServerGame::updateState()
 	{
 		playerPos = player->getShape().getPosition();
 
-		distance = sqrt((playerPos.x - arenaPos.x) * (playerPos.x - arenaPos.x) + (playerPos.y - arenaPos.y) * (playerPos.y - arenaPos.y));
+		distance = sqrt((playerPos.x - arenaPos.x) * (playerPos.x - arenaPos.x) + 
+			(playerPos.y - arenaPos.y) * (playerPos.y - arenaPos.y));
 		
 		if (distance > (arenaShape.getRadius() + player->getShape().getRadius()))
 		{
