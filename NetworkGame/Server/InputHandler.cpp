@@ -37,6 +37,11 @@ void InputHandler::update(const sf::Time& elapsed, sf::RenderWindow& win)
 	{
 		moveVec.x += speed * time;
 	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	{
+		owner->setAttackState(true);
+	}
+	
 	
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 	{
@@ -50,18 +55,18 @@ void InputHandler::update(const sf::Time& elapsed, sf::RenderWindow& win)
 	sf::Vector2i mousePos = sf::Mouse::getPosition(win);
 	sf::Vector2f playerPos = owner->getShape().getPosition();
 
-	float angle3 = atan2f((mousePos.y - playerPos.y), (mousePos.x - playerPos.x));
+	angle = atan2f((mousePos.y - playerPos.y), (mousePos.x - playerPos.x));
 
-	angle3 *= RADTODEG;
+	angle *= RADTODEG;
 
-	if (angle3 < 0)
+	if (angle < 0)
 	{
-		angle3 = 360 - (-angle3);
+		angle = 360 - (-angle);
 	}
 
-	//printf("Angle: %f\n", angle3);
+	//printf("Angle: %f\n", angle);
 
 	owner->getShape().setPosition(pos.x, pos.y);
-	owner->getShape().setRotation(angle3);
+	owner->getShape().setRotation(angle);
 
 }

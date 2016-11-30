@@ -15,16 +15,43 @@ public:
 	{
 		return shape;
 	}
+	
+	sf::RectangleShape& getWeaponShape()
+	{
+		return weaponShape;
+	}
 
 	int getId()
 	{
 		return id;
 	}
+	
+	void setAttackState(bool state)
+	{
+		attacking = state;
+	}
+
+	sf::Vector2f& getSpearTipPoint()
+	{
+		return spearTipPoint;
+	}
 
 private:
-	sf::Sprite sprite;
+
+	int id;
+	bool attacking;
+
+	// Player
+	//sf::Sprite sprite;
 	sf::Texture tex;
 	sf::CircleShape shape;
-	int id;
+
+	// Weapon
+	sf::RectangleShape weaponShape;
+	sf::CircleShape debugShape;
+	sf::Texture weaponTex;
+	sf::Sprite weaponSprite;
+	
+	sf::Vector2f spearTipPoint;
 };
 

@@ -155,6 +155,10 @@ void ServerGame::updateState()
 	bool death = false;
 	sf::Vector2f playerPos; // Player position
 	sf::Vector2f arenaPos = arenaShape.getPosition();
+	sf::Vector2f spearPos;
+	sf::Vector2f otherPos;
+
+	
 
 	for (auto &player : playerContainer)
 	{
@@ -167,8 +171,6 @@ void ServerGame::updateState()
 		{
 			// Kill player
 
-			printf(" Player ID:%d out of range!\n", player->getId());
-
 			death = true;
 
 			if (player->getId() == 0)
@@ -180,9 +182,49 @@ void ServerGame::updateState()
 				score.player1++;
 			}
 
+			printf(" Player ID:%d has fallen out of the arena!\n", player->getId());
 			printf(" Current score:\n Player 1: %d\n Player 2: %d\n\n", score.player1, score.player2);
-
 		}
+
+		if (!death) // Don't check spear collision if the other player is already out of range and dead.
+		{
+			spearPos = player->getSpearTipPoint();
+
+			for (int i = 0; i < playerContainer.size(); i++)
+			{
+				if (playerContainer[i]->getId() != player->getId())
+				{
+					otherPos = playerContainer[i]->getShape().getPosition();
+				}
+			}
+
+			distance = sqrt((spearPos.x - otherPos.x) * (spearPos.x - otherPos.x) +
+				(spearPos.y - otherPos.y) * (spearPos.y - otherPos.y));
+
+			if (player->getId() == 0)
+			{
+				//printf("Distance: %f\n", distance);
+				//printf("P1 Spearpos: %f, %f\n", spearPos.x, spearPos.y);
+			}
+
+			if (distance < player->getShape().getRadius())
+			{
+				death = true;
+
+				if (player->getId() == 0)
+				{
+					score.player1++;
+				}
+				else
+				{
+					score.player2++;
+				}
+
+				printf(" Player ID:%d impaled his foe!\n", player->getId());
+				printf(" Current score:\n Player 1: %d\n Player 2: %d\n\n", score.player1, score.player2);
+			}
+		}
+		
 	}
 
 	if (death)
