@@ -9,10 +9,10 @@
 /////////////// THE GRAND LIST OF TODO ///////////////
 /*
 	_GAME_
-	Mouse tracking and shape rotation.
-	Weapon mechanics
-	Death
-	Points
+	Mouse tracking and shape rotation. Done
+	Weapon mechanics Done
+	Death Done
+	Points Done
 	Graphics, as in player, arena and background textures.
 
 	_NETWORK_
@@ -22,6 +22,13 @@
 	Packet send rate and client/server update rate
 
 */
+
+ServerGame::ServerGame()
+{
+	// SFML Init
+	screenX = 800;
+	screenY = 800;
+}
 
 void ServerGame::run()
 {
@@ -37,7 +44,7 @@ void ServerGame::run()
 	ENetAddress adder;
 
 	adder.host = ENET_HOST_ANY;
-	adder.port = 8888;
+	adder.port = 2302;
 
 	ENetHost *servu = enet_host_create(&adder, 32, 2, 0, 0);
 	ENetEvent event;
@@ -50,6 +57,8 @@ void ServerGame::run()
 	arenaShape.setRadius(300.f);
 	arenaShape.setPointCount(60);
 	arenaShape.setFillColor(sf::Color::White);
+	arenaShape.setOutlineColor(sf::Color::Black);
+	arenaShape.setOutlineThickness(10.f);
 	arenaShape.setOrigin(arenaShape.getRadius(), arenaShape.getRadius());
 	arenaShape.setPosition(screenX / 2, screenY / 2);
 	
@@ -59,6 +68,16 @@ void ServerGame::run()
 	}
 
 	arenaShape.setTexture(&arenaTex);
+
+	backgroundShape.setSize(sf::Vector2f(screenX, screenY));
+	backgroundShape.setFillColor(sf::Color::White);
+
+	if (!backgroundTex.loadFromFile("../Assets/background3.png"))
+	{
+		printf("Background texture loading failed!");
+	}
+
+	backgroundShape.setTexture(&backgroundTex);
 
 	reset();
 	
@@ -109,6 +128,7 @@ void ServerGame::run()
 		}
 
 		window.clear();
+		window.draw(backgroundShape);
 		window.draw(arenaShape);
 
 		for (auto &player : playerContainer)

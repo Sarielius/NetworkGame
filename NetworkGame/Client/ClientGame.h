@@ -2,8 +2,12 @@
 class ClientGame
 {
 public:
-	ClientGame();
-	~ClientGame();
+	ClientGame()
+	{};
+	~ClientGame()
+	{};
 
 	void run();
+
+private:
 };

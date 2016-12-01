@@ -55,8 +55,7 @@ Player::Player(int playerNumber) : id(playerNumber), attacking(false)
 	debugShape.setOutlineColor(sf::Color::Red);
 	debugShape.setOutlineThickness(2.f);
 	debugShape.setOrigin(debugShape.getRadius(), debugShape.getRadius());
-	
-	
+
 }
 
 
@@ -102,7 +101,7 @@ void Player::update()
 	spearTipPoint = trans.transformPoint(spearTipPoint);
 
 
-
+	debugShape.setPosition(spearTipPoint);
 }
 
 void Player::draw(sf::RenderWindow& win)

@@ -15,12 +15,7 @@ struct Score
 class ServerGame
 {
 public:
-	ServerGame()
-	{
-		// SFML Init
-		screenX = 800;
-		screenY = 800;	
-	}
+	ServerGame();
 
 	~ServerGame()
 	{}
@@ -36,5 +31,8 @@ private:
 	std::vector<InputHandler*> handlers;
 	sf::CircleShape arenaShape;
 	sf::Texture arenaTex;
+	sf::RectangleShape backgroundShape;
+	
+	sf::Texture backgroundTex;
 };
 
