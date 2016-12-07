@@ -9,17 +9,17 @@
 /////////////// THE GRAND LIST OF TODO ///////////////
 /*
 	_GAME_
+	Refactor for network usage, endianness etc.
 	Mouse tracking and shape rotation. Done
-	Weapon mechanics Done
+	Weapon mechanics 
 	Death Done
 	Points Done
 	Graphics, as in player, arena and background textures.
 
 	_NETWORK_
-	Everything xd
-	Connection
+	Connection Done
 	Serialization
-	Packet send rate and client/server update rate
+	Packet send rate and client/server update rate // Limit bandwidth on server, send packet each frame on client.
 
 */
 
@@ -133,7 +133,7 @@ void ServerGame::run()
 
 		for (auto &player : playerContainer)
 		{
-			player->update();
+			player->update(elapsed);
 			player->draw(window);
 		}
 

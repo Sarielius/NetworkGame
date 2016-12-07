@@ -39,7 +39,10 @@ void InputHandler::update(const sf::Time& elapsed, sf::RenderWindow& win)
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
-		owner->setAttackState(true);
+		if (owner->playerCanAttack())
+		{
+			owner->setAttackState(true);
+		}	
 	}
 	
 	

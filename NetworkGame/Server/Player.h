@@ -7,7 +7,7 @@ public:
 	Player(int playerNumber);
 	~Player();
 
-	void update();
+	void update(const sf::Time& elapsed);
 	void draw(sf::RenderWindow& win);
 	void setPosition(const sf::Vector2f& pos);
 
@@ -31,6 +31,11 @@ public:
 		attacking = state;
 	}
 
+	bool playerCanAttack()
+	{
+		return canAttack;
+	}
+
 	sf::Vector2f& getSpearTipPoint()
 	{
 		return spearTipPoint;
@@ -40,6 +45,8 @@ private:
 
 	int id;
 	bool attacking;
+	bool canAttack;
+	float accumulator;
 
 	// Player
 	//sf::Sprite sprite;

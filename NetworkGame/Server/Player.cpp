@@ -3,7 +3,7 @@
 #define DEGTORAD 0.0174532925199432957f
 #define RADTODEG 57.295779513082320876f
 
-Player::Player(int playerNumber) : id(playerNumber), attacking(false)
+Player::Player(int playerNumber) : id(playerNumber), attacking(false), canAttack(true), accumulator(0)
 {
 	shape.setRadius(25.f); // Pointcount has a default value of 30.
 	shape.setOrigin(shape.getRadius(), shape.getRadius()); // Origin in the middle.
@@ -63,7 +63,7 @@ Player::~Player()
 {
 }
 
-void Player::update()
+void Player::update(const sf::Time& elapsed) // Packet struct reference for this player?
 {
 	float dx, dy, angle, len, radius, rotation;
 	radius = shape.getRadius();
@@ -76,7 +76,7 @@ void Player::update()
 		
 		weaponShape.setPosition(shape.getPosition().x - dx, shape.getPosition().y + dy);
 	}
-	else
+	if (attacking)
 	{
 		angle = atan2f(-radius * 2, radius);
 
@@ -85,8 +85,29 @@ void Player::update()
 
 		dx = len * 0.9f * sinf(angle);
 		dy = len * 0.9f * cosf(angle);
-		
+
 		weaponShape.setPosition(shape.getPosition().x - dx, shape.getPosition().y + dy);
+
+		if (accumulator >= 0.1)
+		{
+			attacking = false;
+			canAttack = false;
+
+			accumulator = 0;
+		}
+
+		accumulator += elapsed.asSeconds();
+	}
+	
+	if (!canAttack)
+	{
+		if (accumulator >= 0.5)
+		{
+			canAttack = true;
+			accumulator = 0;
+		}
+		accumulator += elapsed.asSeconds();
+
 	}
 
 	weaponShape.setRotation(rotation + 90);
