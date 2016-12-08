@@ -79,6 +79,24 @@ void ServerGame::run()
 
 	backgroundShape.setTexture(&backgroundTex);
 
+	Player* player1 = new Player(0);
+	player1->getShape().setPosition(0,0);
+
+	InputHandler* handler1 = new InputHandler(player1);
+
+	playerContainer.push_back(player1);
+	handlers.push_back(handler1);
+
+	Player* player2 = new Player(1);
+	player2->getShape().setPosition(0,0);
+
+	//InputHandler* handler2 = new InputHandler(player2);
+
+	playerContainer.push_back(player2);
+	//handlers.push_back(handler2);
+
+
+
 	reset();
 	
 	while (running)
@@ -131,6 +149,8 @@ void ServerGame::run()
 		window.draw(backgroundShape);
 		window.draw(arenaShape);
 
+		
+
 		for (auto &player : playerContainer)
 		{
 			player->update(elapsed);
@@ -139,12 +159,12 @@ void ServerGame::run()
 
 		window.display();
 
-		updateState();
-
 		for (auto &handler : handlers)
 		{
 			handler->update(elapsed, window);
 		}
+
+		updateState();
 
 		elapsed = clock.restart();
 		
@@ -256,7 +276,7 @@ void ServerGame::updateState()
 void ServerGame::reset()
 {
 	
-	if (!playerContainer.empty())
+	/*if (!playerContainer.empty())
 	{
 		for (auto &player : playerContainer)
 		{
@@ -271,21 +291,34 @@ void ServerGame::reset()
 		}
 
 		handlers.clear();
+	}*/
+	
+	//Player* player1 = new Player(0);
+	for (int i = 0; i < playerContainer.size(); i++)
+	{
+		if (playerContainer[i]->getId() == 0)
+		{
+			playerContainer[i]->getShape().setPosition(screenX*.25f, screenY / 2);
+		}
+		else
+		{
+			playerContainer[i]->getShape().setPosition(screenX*.75f, screenY / 2);
+		}
+
 	}
-	
-	Player* player1 = new Player(0);
-	player1->getShape().setPosition(screenX*.25f, screenY / 2);
-	
-	InputHandler* handler1 = new InputHandler(player1);
 
-	playerContainer.push_back(player1);
-	handlers.push_back(handler1);
+	//player1->getShape().setPosition(screenX*.25f, screenY / 2);
+	
+	//InputHandler* handler1 = new InputHandler(player1);
 
-	Player* player2 = new Player(1);
-	player2->getShape().setPosition(screenX*.75f, screenY / 2);
+	//playerContainer.push_back(player1);
+	//handlers.push_back(handler1);
+
+	//Player* player2 = new Player(1);
+	//player2->getShape().setPosition(screenX*.75f, screenY / 2);
 
 	//InputHandler* handler2 = new InputHandler(player2);
 
-	playerContainer.push_back(player2);
+	//playerContainer.push_back(player2);
 	//handlers.push_back(handler2);
 }

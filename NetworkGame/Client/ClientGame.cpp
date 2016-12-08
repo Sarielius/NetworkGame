@@ -1,6 +1,7 @@
 #include "ClientGame.h"
 #include "enet\enet.h"
 #include <stdio.h>
+#include <string.h>
 
 #include "Input.h"
 // Localhost IP = 127.0.0.1 try port 2302 or 8888
@@ -8,7 +9,7 @@
 void ClientGame::run()
 {	
 	bool running = true;
-	Input* input = new Input();
+	bool playerQuit = false;
 	char IPaddress[20];
 	
 	sprintf_s(IPaddress, "127.0.0.1");
@@ -34,6 +35,43 @@ void ClientGame::run()
 		//running = false;
 	}
 
+	// SFML
+
+	sf::RenderWindow window(sf::VideoMode(screenX, screenY), "NetworkGame");
+	sf::Clock clock;
+	sf::Time elapsed = clock.getElapsedTime();
+
+	// Shape initializations.
+	arenaShape.setRadius(300.f);
+	arenaShape.setPointCount(60);
+	arenaShape.setFillColor(sf::Color::White);
+	arenaShape.setOutlineColor(sf::Color::Black);
+	arenaShape.setOutlineThickness(10.f);
+	arenaShape.setOrigin(arenaShape.getRadius(), arenaShape.getRadius());
+	arenaShape.setPosition(screenX / 2, screenY / 2);
+
+	if (!arenaTex.loadFromFile("../Assets/arena.png"))
+	{
+		printf("Arena texture loading failed!");
+	}
+
+	arenaShape.setTexture(&arenaTex);
+
+	backgroundShape.setSize(sf::Vector2f(screenX, screenY));
+	backgroundShape.setFillColor(sf::Color::White);
+
+	if (!backgroundTex.loadFromFile("../Assets/background3.png"))
+	{
+		printf("Background texture loading failed!");
+	}
+
+	backgroundShape.setTexture(&backgroundTex);
+
+	// Player and enemy creation.
+
+	ClientPlayer* player = new ClientPlayer(0);
+	Input* input = new Input(player);
+	ClientPlayer* enemy = new ClientPlayer(1);
 	while (running)
 	{
 		// Receive Packet
@@ -67,10 +105,50 @@ void ClientGame::run()
 				event.peer->data = NULL;
 			}
 		}
-		
 		// Update input gather data
-		running = input->update();
+		
 		// Send Packet
+
+		/* Create a reliable packet of size 7 containing "packet\0" */
+		ENetPacket * packet = enet_packet_create("ping", strlen("ping") + 1, ENET_PACKET_FLAG_RELIABLE);
+
+		//enet_packet_resize(packet, strlen("pingfoo") + 1);
+		//strcpy_s((char*)&packet->data, strlen("pingfoo"), "foo");
+		
+		/* Send the packet to the peer over channel id 0. */
+		/* One could also broadcast the packet by         */
+		/* enet_host_broadcast (host, 0, packet);         */
+
+		enet_peer_send(server, 0, packet);
+
+
+		sf::Event sfEvent;
+
+		while (window.pollEvent(sfEvent))
+		{
+			if (sfEvent.type == sf::Event::Closed)
+			{
+				window.close();
+				running = false;
+			}
+		}
+
+		window.clear();
+		window.draw(backgroundShape);
+		window.draw(arenaShape);
+
+		player->draw(window);
+		enemy->draw(window);
+
+		window.display();
+
+		player->update(elapsed);
+
+		input->update(elapsed, window);
+
+		elapsed = clock.restart();
+
+		
 		
 	}
 	

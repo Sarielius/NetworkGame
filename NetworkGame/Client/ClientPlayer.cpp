@@ -1,9 +1,10 @@
-#include "Player.h"
+#include "ClientPlayer.h"
 
 #define DEGTORAD 0.0174532925199432957f
 #define RADTODEG 57.295779513082320876f
 
-Player::Player(int playerNumber) : id(playerNumber), attacking(false), canAttack(true), accumulator(0)
+
+ClientPlayer::ClientPlayer(int playerID) : id(playerID), attacking(false)
 {
 	shape.setRadius(25.f); // Pointcount has a default value of 30.
 	shape.setOrigin(shape.getRadius(), shape.getRadius()); // Origin in the middle.
@@ -49,21 +50,14 @@ Player::Player(int playerNumber) : id(playerNumber), attacking(false), canAttack
 
 	weaponSprite.setTexture(weaponTex);
 	weaponSprite.setOrigin(weaponTex.getSize().x / 2, weaponTex.getSize().y / 2);
-	
-	debugShape.setRadius(5.0f);
-	debugShape.setFillColor(sf::Color::Transparent);
-	debugShape.setOutlineColor(sf::Color::Red);
-	debugShape.setOutlineThickness(2.f);
-	debugShape.setOrigin(debugShape.getRadius(), debugShape.getRadius());
-
 }
 
 
-Player::~Player()
+ClientPlayer::~ClientPlayer()
 {
 }
 
-void Player::update(const sf::Time& elapsed) // Packet struct reference for this player?
+void ClientPlayer::update(const sf::Time& elapsed)
 {
 	float dx, dy, angle, len, radius, rotation;
 	radius = shape.getRadius();
@@ -73,7 +67,7 @@ void Player::update(const sf::Time& elapsed) // Packet struct reference for this
 	{
 		dx = radius * 0.9f * sinf((rotation * DEGTORAD));
 		dy = radius * 0.9f * cosf((rotation * DEGTORAD));
-		
+
 		weaponShape.setPosition(shape.getPosition().x - dx, shape.getPosition().y + dy);
 	}
 	if (attacking)
@@ -87,27 +81,6 @@ void Player::update(const sf::Time& elapsed) // Packet struct reference for this
 		dy = len * 0.9f * cosf(angle);
 
 		weaponShape.setPosition(shape.getPosition().x - dx, shape.getPosition().y + dy);
-
-		if (accumulator >= 0.1)
-		{
-			attacking = false;
-			canAttack = false;
-
-			accumulator = 0;
-		}
-
-		accumulator += elapsed.asSeconds();
-	}
-	
-	if (!canAttack)
-	{
-		if (accumulator >= 0.5)
-		{
-			canAttack = true;
-			accumulator = 0;
-		}
-		accumulator += elapsed.asSeconds();
-
 	}
 
 	weaponShape.setRotation(rotation + 90);
@@ -120,23 +93,12 @@ void Player::update(const sf::Time& elapsed) // Packet struct reference for this
 	trans = weaponShape.getTransform();
 
 	spearTipPoint = trans.transformPoint(spearTipPoint);
-
-
-	debugShape.setPosition(spearTipPoint);
 }
 
-void Player::draw(sf::RenderWindow& win)
+
+
+void ClientPlayer::draw(sf::RenderWindow& win)
 {
 	win.draw(weaponSprite);
 	win.draw(shape);
-	
-	//win.draw(weaponShape);
-	win.draw(debugShape);
-
 }
-
-//void Player::setPosition(const sf::Vector2f& pos)
-//{
-//	shape.setPosition(pos);
-//}
-

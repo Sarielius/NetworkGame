@@ -9,7 +9,7 @@ public:
 
 	void update(const sf::Time& elapsed);
 	void draw(sf::RenderWindow& win);
-	void setPosition(const sf::Vector2f& pos);
+	//void setPosition(const sf::Vector2f& pos);
 
 	sf::CircleShape& getShape()
 	{
