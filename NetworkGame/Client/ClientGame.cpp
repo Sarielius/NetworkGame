@@ -1,16 +1,60 @@
 #include "ClientGame.h"
-#include "enet\enet.h"
+
 #include <stdio.h>
 #include <string.h>
 
-#include "Input.h"
+
 // Localhost IP = 127.0.0.1 try port 2302 or 8888
+
+enum PacketType
+{
+	INIT = 0,	// ID of the player, confirmation of connection
+	DATA,		// Updated positions and such from the server
+	MESSAGE		// Messages such as player deaths and current score
+};
+
+struct InitData
+{
+	enet_uint8 type = PacketType::INIT;
+	enet_uint8 id;
+};
+
+struct ServerData
+{
+	enet_uint8 type = PacketType::DATA;
+
+	enet_uint8 p1Attk : 1; // Whether or not the player is attacking
+	enet_uint8 p2Attk : 1;
+
+	float p1PosX; // Positions and where the player is looking.
+	float p1PosY;
+	float p1Angle;
+
+	float p2PosX;
+	float p2PosY;
+	float p2Angle;
+};
+
+struct MessageData
+{
+	enet_uint8 type = PacketType::MESSAGE;
+	char message[50];
+};
+
 
 void ClientGame::run()
 {	
 	bool running = true;
-	bool playerQuit = false;
 	char IPaddress[20];
+
+	PlayerData outboundData;
+	
+	InitData initData;
+	ServerData serverData;
+	MessageData messageData;
+
+
+	//char buffer[256];
 	
 	sprintf_s(IPaddress, "127.0.0.1");
 
@@ -18,6 +62,7 @@ void ClientGame::run()
 	{
 		printf("Fug\n");
 	}
+	
 
 	ENetHost* client;
 	client = enet_host_create(NULL, 1, 2, 0, 0);
@@ -38,6 +83,7 @@ void ClientGame::run()
 	// SFML
 
 	sf::RenderWindow window(sf::VideoMode(screenX, screenY), "NetworkGame");
+	window.setFramerateLimit(60);
 	sf::Clock clock;
 	sf::Time elapsed = clock.getElapsedTime();
 
@@ -69,11 +115,15 @@ void ClientGame::run()
 
 	// Player and enemy creation.
 
-	ClientPlayer* player = new ClientPlayer(0);
-	Input* input = new Input(player);
-	ClientPlayer* enemy = new ClientPlayer(1);
+	player = new ClientPlayer();
+	input = new Input(player);
+	enemy = new ClientPlayer();
+
+
 	while (running)
 	{
+		int type;
+		enet_uint32 packetSize;
 		// Receive Packet
 		ENetEvent event;
 
@@ -89,11 +139,48 @@ void ClientGame::run()
 				event.peer->data = "Server information";
 				break;
 			case ENET_EVENT_TYPE_RECEIVE:
-				printf("A packet of length %u containing %s was received from %s on channel %u.\n",
-					event.packet->dataLength,
-					event.packet->data,
-					event.peer->data,
-					event.channelID);
+
+				packetSize = enet_uint32(event.packet->dataLength);
+				type = *event.packet->data;
+
+				//printf("Type: %d\n", type);
+
+				switch (type)
+				{
+				case PacketType::INIT:
+					//printf("Type: INIT\n");
+					memcpy(&initData, event.packet->data, event.packet->dataLength);
+
+					player->setID(initData.id);
+
+					if (initData.id == 0)
+					{
+						enemy->setID(1);
+					}
+					else
+					{
+						enemy->setID(0);
+					}
+					
+					break;
+				case PacketType::DATA:
+					//printf("Type: DATA\n");
+					memcpy(&serverData, event.packet->data, event.packet->dataLength);
+
+					//Interpolate with old position!
+					interpolate(serverData);
+
+					break;
+				case PacketType::MESSAGE:
+					//printf("Type: MESSAGE\n");
+					memcpy(&messageData, event.packet->data, event.packet->dataLength);
+					printf("%s\n", messageData.message);
+
+					break;
+				default:
+					break;
+				}
+
 				/* Clean up the packet now that we're done using it. */
 				enet_packet_destroy(event.packet);
 
@@ -105,22 +192,6 @@ void ClientGame::run()
 				event.peer->data = NULL;
 			}
 		}
-		// Update input gather data
-		
-		// Send Packet
-
-		/* Create a reliable packet of size 7 containing "packet\0" */
-		ENetPacket * packet = enet_packet_create("ping", strlen("ping") + 1, ENET_PACKET_FLAG_RELIABLE);
-
-		//enet_packet_resize(packet, strlen("pingfoo") + 1);
-		//strcpy_s((char*)&packet->data, strlen("pingfoo"), "foo");
-		
-		/* Send the packet to the peer over channel id 0. */
-		/* One could also broadcast the packet by         */
-		/* enet_host_broadcast (host, 0, packet);         */
-
-		enet_peer_send(server, 0, packet);
-
 
 		sf::Event sfEvent;
 
@@ -133,7 +204,9 @@ void ClientGame::run()
 			}
 		}
 
+
 		window.clear();
+
 		window.draw(backgroundShape);
 		window.draw(arenaShape);
 
@@ -144,18 +217,48 @@ void ClientGame::run()
 
 		player->update(elapsed);
 
-		input->update(elapsed, window);
+		// Update input and gather data
 
+		input->update(elapsed, window, outboundData);
+		
 		elapsed = clock.restart();
 
-		
-		
+		// Send Packet
+		ENetPacket* packet = enet_packet_create(&outboundData, sizeof(outboundData), ENET_PACKET_FLAG_RELIABLE);
+
+		enet_peer_send(server, 0, packet);
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+		{
+			running = false;
+		}
+
 	}
-	
-	delete input;
+
+	if (player != nullptr)
+	{
+		delete player;
+		delete input;
+		delete enemy;
+	}
 
 	enet_host_destroy(client);
 
 	enet_deinitialize();
 
+}
+
+
+void ClientGame::interpolate(ServerData& sData)
+{
+	if (player->getID() == 0)
+	{
+		player->transform(sData.p1PosX, sData.p1PosY, sData.p1Angle, sData.p1Attk);
+		enemy->transform(sData.p2PosX, sData.p2PosY, sData.p2Angle, sData.p2Attk);
+	}
+	else
+	{
+		enemy->transform(sData.p1PosX, sData.p1PosY, sData.p1Angle, sData.p1Attk);
+		player->transform(sData.p2PosX, sData.p2PosY, sData.p2Angle, sData.p2Attk);
+	}
 }

@@ -4,13 +4,11 @@
 #define RADTODEG 57.295779513082320876f
 
 
-ClientPlayer::ClientPlayer(int playerID) : id(playerID), attacking(false)
+ClientPlayer::ClientPlayer() : attacking(false), id(0)
 {
 	shape.setRadius(25.f); // Pointcount has a default value of 30.
 	shape.setOrigin(shape.getRadius(), shape.getRadius()); // Origin in the middle.
-	shape.setFillColor(sf::Color::White); // Set Default color, prob need to make custom sprites for the players.
-
-	// Quick hax to determine which texture to use, handled better when clientside. Maybe.
+	shape.setFillColor(sf::Color::White); 
 
 	if (id == 0)
 	{
@@ -22,9 +20,6 @@ ClientPlayer::ClientPlayer(int playerID) : id(playerID), attacking(false)
 
 		shape.setTexture(&tex);
 
-		/*sprite.setTexture(tex);
-		sprite.setOrigin(tex.getSize().x / 2, tex.getSize().y / 2);*/
-
 	}
 	else
 	{
@@ -33,8 +28,7 @@ ClientPlayer::ClientPlayer(int playerID) : id(playerID), attacking(false)
 			printf("Failed to load player texture! Player ID: %d", id);
 			return;
 		}
-		/*sprite.setTexture(tex);
-		sprite.setOrigin(tex.getSize().x / 2, tex.getSize().y / 2);*/
+		
 		shape.setTexture(&tex);
 		shape.setRotation(180.f);
 	}
@@ -95,10 +89,15 @@ void ClientPlayer::update(const sf::Time& elapsed)
 	spearTipPoint = trans.transformPoint(spearTipPoint);
 }
 
-
-
 void ClientPlayer::draw(sf::RenderWindow& win)
 {
 	win.draw(weaponSprite);
 	win.draw(shape);
+}
+
+void ClientPlayer::transform(float posX, float posY, float angle, bool attk)
+{
+	shape.setPosition(posX, posY);
+	shape.setRotation(angle);
+	attacking = attk;
 }

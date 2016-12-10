@@ -2,14 +2,17 @@
 #include "SFML\Graphics.hpp"
 #include "ClientPlayer.h"
 
+struct PlayerData;
+
+
 class Input
 {
 public:
 	Input(ClientPlayer* player);
 	~Input();
 
-	bool update(const sf::Time& elapsed, sf::RenderWindow& win); // Bool for now...
-
+	void update(const sf::Time& elapsed, sf::RenderWindow& win, PlayerData& data); // Bool for now...
+	
 private:
 	sf::Vector2f pos;
 	sf::Vector2f moveVec;

@@ -4,11 +4,22 @@
 class ClientPlayer
 {
 public:
-	ClientPlayer(int playerID);
+	ClientPlayer();
 	~ClientPlayer();
 	
 	void update(const sf::Time& elapsed);
 	void draw(sf::RenderWindow& win);
+	void transform(float posX, float posY, float angle, bool attk);
+
+	int getID()
+	{
+		return id;
+	}
+
+	void setID(int playerID)
+	{
+		playerID = id;
+	}
 
 	sf::CircleShape& getShape()
 	{

@@ -11,6 +11,8 @@ struct Score
 	int player2 = 0;
 };
 
+struct ServerData;
+struct PlayerData;
 
 class ServerGame
 {
@@ -22,10 +24,13 @@ public:
 
 	void run();
 	void updateState();
+	bool createPlayer();
 	void reset();
+	void updateNetworkData(PlayerData& pData, ServerData& sData, const sf::Time& elapsed);
 
 private:
-	int screenX, screenY;
+	int screenX, screenY, playerCount, id;
+	float speed;
 	Score score;
 	std::vector<Player*> playerContainer;
 	std::vector<InputHandler*> handlers;

@@ -11,18 +11,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{65788F90-95B8-4BE8-AFE2-94AD9D64930E}</ProjectGuid>
-    <RootNamespace>Server</RootNamespace>
+    <ProjectGuid>{48987FCE-7BAF-42E2-A7CA-61284782F5C8}</ProjectGuid>
+    <RootNamespace>enet</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -44,13 +44,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\ThirdParty\ENet\include;$(SolutionDir)\ThirdParty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\ThirdParty\ENet\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Debug;$(SolutionDir)\ThirdParty\SFML\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>enet.lib;ws2_32.lib;winmm.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -60,26 +58,25 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\ThirdParty\ENet\include;$(SolutionDir)\ThirdParty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\ThirdParty\ENet\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>enet.lib;ws2_32.lib;winmm.lib;sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Release;$(SolutionDir)\ThirdParty\SFML\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="InputHandler.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="ServerGame.cpp" />
-    <ClCompile Include="ServerMain.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="InputHandler.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="ServerGame.h" />
+    <ClCompile Include="..\ThirdParty\ENet\callbacks.c" />
+    <ClCompile Include="..\ThirdParty\ENet\compress.c" />
+    <ClCompile Include="..\ThirdParty\ENet\host.c" />
+    <ClCompile Include="..\ThirdParty\ENet\list.c" />
+    <ClCompile Include="..\ThirdParty\ENet\packet.c" />
+    <ClCompile Include="..\ThirdParty\ENet\peer.c" />
+    <ClCompile Include="..\ThirdParty\ENet\protocol.c" />
+    <ClCompile Include="..\ThirdParty\ENet\unix.c" />
+    <ClCompile Include="..\ThirdParty\ENet\win32.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
