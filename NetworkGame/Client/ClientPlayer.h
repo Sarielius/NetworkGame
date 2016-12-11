@@ -18,7 +18,7 @@ public:
 
 	void setID(int playerID)
 	{
-		playerID = id;
+		id = playerID;
 	}
 
 	sf::CircleShape& getShape()

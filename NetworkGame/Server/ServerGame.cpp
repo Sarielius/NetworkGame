@@ -179,7 +179,6 @@ void ServerGame::run()
 					enet_peer_send(event.peer, 0, packet);
 					id++;
 
-					reset();
 					// !!! SEND INITIAL POSITION !!! 
 
 					//updateNetworkData(playerData, serverData, elapsed);
@@ -411,8 +410,20 @@ void ServerGame::updateNetworkData(PlayerData& pData, ServerData& sData, const s
 	sf::Vector2f moveVec = { 0, 0 };
 	float angle = pData.angle;
 	float time = elapsed.asSeconds();
-	Player* player = playerContainer[pData.id];
-	sf::Vector2f pos = player->getShape().getPosition();
+	Player* player1 = playerContainer[pData.id];
+	Player* player2 = nullptr;
+
+	if (player1->getId() == 0 && playerContainer.size() > 1)
+	{
+		player2 = playerContainer[1];
+	}
+	else if (playerContainer.size() > 1)
+	{
+		player2 = playerContainer[0];
+	}
+
+
+	sf::Vector2f pos = player1->getShape().getPosition();
 
 	if (pData.up)
 	{
@@ -441,9 +452,9 @@ void ServerGame::updateNetworkData(PlayerData& pData, ServerData& sData, const s
 
 	if (pData.attacking)
 	{
-		if (player->playerCanAttack())
+		if (player1->playerCanAttack())
 		{
-			player->setAttackState(true);
+			player1->setAttackState(true);
 			if (pData.id == 0)
 			{
 				sData.p1Attk = 1;
@@ -466,19 +477,34 @@ void ServerGame::updateNetworkData(PlayerData& pData, ServerData& sData, const s
 		}
 	}
 	
-	player->getShape().setPosition(pos.x, pos.y);
-	player->getShape().setRotation(angle);
+	player1->getShape().setPosition(pos.x, pos.y);
+	player1->getShape().setRotation(angle);
 
 	if (pData.id == 0)
 	{
-		sData.p1Angle = player->getShape().getRotation();
-		sData.p1PosX = player->getShape().getPosition().x;
-		sData.p1PosY = player->getShape().getPosition().y;
+		sData.p1Angle = player1->getShape().getRotation();
+		sData.p1PosX = player1->getShape().getPosition().x;
+		sData.p1PosY = player1->getShape().getPosition().y;
+
+		if (player2 != nullptr)
+		{
+			sData.p2Angle = player2->getShape().getRotation();
+			sData.p2PosX = player2->getShape().getPosition().x;
+			sData.p2PosY = player2->getShape().getPosition().y;
+		}
+		
 	}
 	else
 	{
-		sData.p2Angle = player->getShape().getRotation();
-		sData.p2PosX = player->getShape().getPosition().x;
-		sData.p2PosY = player->getShape().getPosition().y;
+		sData.p2Angle = player1->getShape().getRotation();
+		sData.p2PosX = player1->getShape().getPosition().x;
+		sData.p2PosY = player1->getShape().getPosition().y;
+
+		if (player2 != nullptr)
+		{
+			sData.p1Angle = player2->getShape().getRotation();
+			sData.p1PosX = player2->getShape().getPosition().x;
+			sData.p1PosY = player2->getShape().getPosition().y;
+		}
 	}
 }

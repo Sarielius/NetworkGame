@@ -161,6 +161,8 @@ void ClientGame::run()
 					{
 						enemy->setID(0);
 					}
+
+					printf("My ID:%d\n", player->getID());
 					
 					break;
 				case PacketType::DATA:
