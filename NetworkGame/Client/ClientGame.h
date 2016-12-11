@@ -19,6 +19,15 @@ struct PlayerData
 	float angle;
 };
 
+
+struct NetworkInfo
+{
+	ENetHost* client;
+	ENetAddress address;
+	ENetPeer* server;
+	char IP[25];
+};
+
 struct ServerData;
 
 class ClientGame
@@ -34,11 +43,14 @@ public:
 
 	void run();
 	void interpolate(ServerData& sData);
+	bool initialize(NetworkInfo& netInfo);
 
 private:
-	int screenX, screenY;
-	ClientPlayer* player;
-	ClientPlayer* enemy;
+	int screenX, screenY, myID;
+	bool initDone;
+
+	std::vector<ClientPlayer*> players;
+	
 	Input* input;
 	sf::CircleShape arenaShape;
 	sf::Texture arenaTex;

@@ -4,7 +4,7 @@
 class ClientPlayer
 {
 public:
-	ClientPlayer();
+	ClientPlayer(int myID);
 	~ClientPlayer();
 	
 	void update(const sf::Time& elapsed);

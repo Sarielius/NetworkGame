@@ -4,7 +4,7 @@
 #define RADTODEG 57.295779513082320876f
 
 
-ClientPlayer::ClientPlayer() : attacking(false), id(0)
+ClientPlayer::ClientPlayer(int myID) : attacking(false), id(myID)
 {
 	shape.setRadius(25.f); // Pointcount has a default value of 30.
 	shape.setOrigin(shape.getRadius(), shape.getRadius()); // Origin in the middle.

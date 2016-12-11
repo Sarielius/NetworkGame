@@ -42,10 +42,11 @@ struct MessageData
 };
 
 
+
 void ClientGame::run()
 {	
 	bool running = true;
-	char IPaddress[20];
+	char IPaddress[25];
 
 	PlayerData outboundData;
 	
@@ -53,32 +54,35 @@ void ClientGame::run()
 	ServerData serverData;
 	MessageData messageData;
 
+	NetworkInfo netInfo;
 
-	//char buffer[256];
+	printf("Enter IP:\n> ");
+	gets_s(netInfo.IP);
 	
-	sprintf_s(IPaddress, "127.0.0.1");
+	//sprintf_s(IPaddress, "127.0.0.1");
 
 	if (enet_initialize() != 0)
 	{
 		printf("Fug\n");
 	}
 	
+	initDone = initialize(netInfo);
 
-	ENetHost* client;
-	client = enet_host_create(NULL, 1, 2, 0, 0);
-	ENetAddress address;
-	ENetPeer* server;
-	
-	enet_address_set_host(&address, IPaddress);
-	address.port = 2302;
+	//ENetHost* client;
+	//client = enet_host_create(NULL, 1, 2, 0, 0);
+	//ENetAddress address;
+	//ENetPeer* server;
+	//
+	//enet_address_set_host(&address, IPaddress);
+	//address.port = 2302;
 
-	server = enet_host_connect(client, &address, 2, 0);
+	//server = enet_host_connect(client, &address, 2, 0);
 
-	if (server == nullptr)
-	{
-		printf("No available peers for initiating an ENet connection.\n");
-		//running = false;
-	}
+	//if (server == nullptr)
+	//{
+	//	printf("\nNo available peers for initiating an ENet connection.\n");
+	//	//running = false;
+	//}
 
 	// SFML
 
@@ -98,7 +102,7 @@ void ClientGame::run()
 
 	if (!arenaTex.loadFromFile("../Assets/arena.png"))
 	{
-		printf("Arena texture loading failed!");
+		printf("\nArena texture loading failed!\n");
 	}
 
 	arenaShape.setTexture(&arenaTex);
@@ -108,143 +112,150 @@ void ClientGame::run()
 
 	if (!backgroundTex.loadFromFile("../Assets/background3.png"))
 	{
-		printf("Background texture loading failed!");
+		printf("\nBackground texture loading failed!\n");
 	}
 
 	backgroundShape.setTexture(&backgroundTex);
 
 	// Player and enemy creation.
 
-	player = new ClientPlayer();
-	input = new Input(player);
-	enemy = new ClientPlayer();
+	
 
-
-	while (running)
+	if (initDone)
 	{
-		int type;
-		enet_uint32 packetSize;
-		// Receive Packet
-		ENetEvent event;
+		input = new Input(players[0]);
 
-		while (enet_host_service(client, &event, 0) > 0)
+		while (running)
 		{
-			switch (event.type)
+			int type;
+
+			// Receive Packet
+			ENetEvent event;
+
+			while (enet_host_service(netInfo.client, &event, 0) > 0)
 			{
-			case ENET_EVENT_TYPE_CONNECT:
-				printf("Connected to server in location %s:%u.\n",
-					IPaddress,
-					event.peer->address.port);
-				/* Store any relevant server information here. */
-				event.peer->data = "Server information";
-				break;
-			case ENET_EVENT_TYPE_RECEIVE:
-
-				packetSize = enet_uint32(event.packet->dataLength);
-				type = *event.packet->data;
-
-				//printf("Type: %d\n", type);
-
-				switch (type)
+				switch (event.type)
 				{
-				case PacketType::INIT:
-					//printf("Type: INIT\n");
-					memcpy(&initData, event.packet->data, event.packet->dataLength);
+				//case ENET_EVENT_TYPE_CONNECT:
+				//	printf("\nConnected to server in location %s:%u.\n",
+				//		IPaddress,
+				//		event.peer->address.port);
+				//	/* Store any relevant server information here. */
+				//	event.peer->data = "Server information";
+				//	break;
+				case ENET_EVENT_TYPE_RECEIVE:
 
-					player->setID(initData.id);
+					type = *event.packet->data;
 
-					if (initData.id == 0)
+					//printf("Type: %d\n", type);
+
+					switch (type)
 					{
-						enemy->setID(1);
+					//case PacketType::INIT:
+					//	//printf("Type: INIT\n");
+					//	memcpy(&initData, event.packet->data, event.packet->dataLength);
+
+					//	player->setID(initData.id);
+
+					//	if (initData.id == 0)
+					//	{
+					//		enemy->setID(1);
+					//	}
+					//	else
+					//	{
+					//		enemy->setID(0);
+					//	}
+
+					//	printf("My ID:%d\n", player->getID());
+
+					//	break;
+					case PacketType::DATA:
+						//printf("Type: DATA\n");
+						memcpy(&serverData, event.packet->data, event.packet->dataLength);
+
+						//Interpolate with old position!
+						interpolate(serverData);
+
+						break;
+					case PacketType::MESSAGE:
+						//printf("Type: MESSAGE\n");
+						memcpy(&messageData, event.packet->data, event.packet->dataLength);
+						printf("\n%s\n", messageData.message);
+
+						break;
+					default:
+						break;
 					}
-					else
-					{
-						enemy->setID(0);
-					}
 
-					printf("My ID:%d\n", player->getID());
-					
-					break;
-				case PacketType::DATA:
-					//printf("Type: DATA\n");
-					memcpy(&serverData, event.packet->data, event.packet->dataLength);
-
-					//Interpolate with old position!
-					interpolate(serverData);
+					/* Clean up the packet now that we're done using it. */
+					enet_packet_destroy(event.packet);
 
 					break;
-				case PacketType::MESSAGE:
-					//printf("Type: MESSAGE\n");
-					memcpy(&messageData, event.packet->data, event.packet->dataLength);
-					printf("%s\n", messageData.message);
 
-					break;
-				default:
-					break;
+				case ENET_EVENT_TYPE_DISCONNECT:
+					printf("\n%s disconnected.\n", event.peer->data);
+					/* Reset the peer's client information. */
+					event.peer->data = NULL;
 				}
-
-				/* Clean up the packet now that we're done using it. */
-				enet_packet_destroy(event.packet);
-
-				break;
-
-			case ENET_EVENT_TYPE_DISCONNECT:
-				printf("%s disconnected.\n", event.peer->data);
-				/* Reset the peer's client information. */
-				event.peer->data = NULL;
 			}
-		}
 
-		sf::Event sfEvent;
+			sf::Event sfEvent;
 
-		while (window.pollEvent(sfEvent))
-		{
-			if (sfEvent.type == sf::Event::Closed)
+			while (window.pollEvent(sfEvent))
 			{
-				window.close();
+				if (sfEvent.type == sf::Event::Closed)
+				{
+					window.close();
+					running = false;
+				}
+			}
+
+
+			window.clear();
+
+			window.draw(backgroundShape);
+			window.draw(arenaShape);
+
+			for (auto &player : players)
+			{
+				player->draw(window);
+				player->update(elapsed);
+			}
+
+			window.display();
+
+			// Update input and gather data
+
+			input->update(elapsed, window, outboundData);
+
+			elapsed = clock.restart();
+
+			// Send Packet
+			ENetPacket* packet = enet_packet_create(&outboundData, sizeof(outboundData), ENET_PACKET_FLAG_RELIABLE);
+
+			enet_peer_send(netInfo.server, 0, packet);
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+			{
 				running = false;
 			}
 		}
+	}
+	
 
-
-		window.clear();
-
-		window.draw(backgroundShape);
-		window.draw(arenaShape);
-
-		player->draw(window);
-		enemy->draw(window);
-
-		window.display();
-
-		player->update(elapsed);
-
-		// Update input and gather data
-
-		input->update(elapsed, window, outboundData);
-		
-		elapsed = clock.restart();
-
-		// Send Packet
-		ENetPacket* packet = enet_packet_create(&outboundData, sizeof(outboundData), ENET_PACKET_FLAG_RELIABLE);
-
-		enet_peer_send(server, 0, packet);
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+	if (!players.empty())
+	{
+		for (auto &player : players)
 		{
-			running = false;
+			delete player;
 		}
 
-	}
+		players.clear();
 
-	if (player != nullptr)
-	{
-		delete player;
 		delete input;
-		delete enemy;
 	}
 
-	enet_host_destroy(client);
+	enet_host_destroy(netInfo.client);
 
 	enet_deinitialize();
 
@@ -253,6 +264,10 @@ void ClientGame::run()
 
 void ClientGame::interpolate(ServerData& sData)
 {
+	ClientPlayer* player = players[0];
+	ClientPlayer* enemy = players[1];
+
+
 	if (player->getID() == 0)
 	{
 		player->transform(sData.p1PosX, sData.p1PosY, sData.p1Angle, sData.p1Attk);
@@ -263,4 +278,66 @@ void ClientGame::interpolate(ServerData& sData)
 		enemy->transform(sData.p1PosX, sData.p1PosY, sData.p1Angle, sData.p1Attk);
 		player->transform(sData.p2PosX, sData.p2PosY, sData.p2Angle, sData.p2Attk);
 	}
+}
+
+bool ClientGame::initialize(NetworkInfo& netInfo)
+{
+	int type;
+	InitData initData;
+
+	netInfo.client = enet_host_create(NULL, 1, 2, 0, 0);
+	enet_address_set_host(&netInfo.address, netInfo.IP);
+	netInfo.address.port = 2302;
+	netInfo.server = enet_host_connect(netInfo.client, &netInfo.address, 2, 0);
+
+
+	if (netInfo.server == nullptr)
+	{
+		printf("No available peers for initiating an ENet connection.\n");
+		return false;
+	}
+
+	ENetEvent event;
+
+	if (enet_host_service(netInfo.client, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT)
+	{
+		printf("Connected to server in location %s:%u.\n",
+			netInfo.IP,
+			event.peer->address.port);
+
+		if (enet_host_service(netInfo.client, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_RECEIVE)
+		{
+			type = *event.packet->data;
+
+			switch (type)
+			{
+			case PacketType::INIT:
+				//printf("Type: INIT\n");
+				memcpy(&initData, event.packet->data, event.packet->dataLength);
+
+				//player->setID(initData.id);
+				players.push_back(new ClientPlayer(initData.id));
+
+				if (initData.id == 0)
+				{
+					players.push_back(new ClientPlayer(1));
+				}
+				else
+				{
+					players.push_back(new ClientPlayer(0));
+				}
+
+				printf("My ID:%d\n", initData.id);
+			}
+
+			enet_packet_destroy(event.packet);
+		}
+	}
+	else
+	{
+		enet_peer_reset(netInfo.server);
+		return false;
+	}
+
+	return true;
 }
