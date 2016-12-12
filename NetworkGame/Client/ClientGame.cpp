@@ -38,7 +38,7 @@ struct ServerData
 struct MessageData
 {
 	enet_uint8 type = PacketType::MESSAGE;
-	char message[50];
+	char message[256];
 };
 
 
@@ -117,10 +117,6 @@ void ClientGame::run()
 
 	backgroundShape.setTexture(&backgroundTex);
 
-	// Player and enemy creation.
-
-	
-
 	if (initDone)
 	{
 		input = new Input(players[0]);
@@ -174,13 +170,14 @@ void ClientGame::run()
 						memcpy(&serverData, event.packet->data, event.packet->dataLength);
 
 						//Interpolate with old position!
+						// Currently hard setting server values, not enough time to properly interpolate.
 						interpolate(serverData);
 
 						break;
 					case PacketType::MESSAGE:
 						//printf("Type: MESSAGE\n");
 						memcpy(&messageData, event.packet->data, event.packet->dataLength);
-						printf("\n%s\n", messageData.message);
+						printf("%s\n", messageData.message);
 
 						break;
 					default:
@@ -335,6 +332,7 @@ bool ClientGame::initialize(NetworkInfo& netInfo)
 	}
 	else
 	{
+		printf("Could not connect!\n");
 		enet_peer_reset(netInfo.server);
 		return false;
 	}

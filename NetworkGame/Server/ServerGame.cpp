@@ -79,7 +79,7 @@ struct InitData
 struct MessageData
 {
 	enet_uint8 type = PacketType::MESSAGE;
-	char message[50];
+	char message[256];
 };
 
 
@@ -101,8 +101,6 @@ void ServerGame::run()
 	MessageData messageData;
 	PlayerData playerData;
 	ServerData serverData;
-
-
 
 	// ENet init
 	
@@ -129,28 +127,28 @@ void ServerGame::run()
 	
 	arenaShape.setRadius(300.f);
 	arenaShape.setPointCount(60);
-	arenaShape.setFillColor(sf::Color::White);
-	arenaShape.setOutlineColor(sf::Color::Black);
+	arenaShape.setFillColor(sf::Color::Green);
+	arenaShape.setOutlineColor(sf::Color::White);
 	arenaShape.setOutlineThickness(10.f);
 	arenaShape.setOrigin(arenaShape.getRadius(), arenaShape.getRadius());
 	arenaShape.setPosition(screenX / 2, screenY / 2);
 	
-	if (!arenaTex.loadFromFile("../Assets/arena.png"))
+	/*if (!arenaTex.loadFromFile("../Assets/arena.png"))
 	{
 		printf("Arena texture loading failed!");
 	}
 
-	arenaShape.setTexture(&arenaTex);
+	arenaShape.setTexture(&arenaTex);*/
 
 	backgroundShape.setSize(sf::Vector2f(screenX, screenY));
-	backgroundShape.setFillColor(sf::Color::White);
+	backgroundShape.setFillColor(sf::Color::Black);
 
-	if (!backgroundTex.loadFromFile("../Assets/background3.png"))
+	/*if (!backgroundTex.loadFromFile("../Assets/background3.png"))
 	{
 		printf("Background texture loading failed!");
 	}
 
-	backgroundShape.setTexture(&backgroundTex);
+	backgroundShape.setTexture(&backgroundTex);*/
 
 	reset();
 	
@@ -179,14 +177,10 @@ void ServerGame::run()
 					enet_peer_send(event.peer, 0, packet);
 					id++;
 
-					// !!! SEND INITIAL POSITION !!! 
-
-					//updateNetworkData(playerData, serverData, elapsed);
-
-					/*MessageData data;
-					sprintf_s(data.message, "This is a test message.");
+					MessageData data;
+					sprintf_s(data.message, "\nPlayer connected, Game state and score reset!\n");
 					packet = enet_packet_create(&data, sizeof(data), 0);
-					enet_peer_send(event.peer, 0, packet);*/
+					enet_host_broadcast(servu, 0, packet);
 				}
 				else
 				{
@@ -194,6 +188,7 @@ void ServerGame::run()
 					packet = enet_packet_create(&messageData, sizeof(messageData), 0);
 					enet_peer_send(event.peer, 0, packet);
 				}
+				score.reset();
 				reset();
 				break;
 
@@ -237,24 +232,13 @@ void ServerGame::run()
 		window.draw(backgroundShape);
 		window.draw(arenaShape);
 
-		/*if (playerData.id == 0 || playerData.id == 1)
-		{
-			updateNetworkData(playerData, serverData, elapsed);
-		}*/
-
 		for (auto &player : playerContainer)
 		{
 			player->update(elapsed);
 			player->draw(window);
-
 		}
 
 		window.display();
-
-		/*for (auto &handler : handlers)
-		{
-			handler->update(elapsed, window);
-		}*/
 
 		if (!peers.empty())
 		{
@@ -265,7 +249,14 @@ void ServerGame::run()
 			}
 		}
 
-		updateState();
+		updateState(messageData);
+
+		if (scoreChanged)
+		{
+			ENetPacket* packet = enet_packet_create(&messageData, sizeof(messageData), 0);
+			enet_host_broadcast(servu, 0, packet);
+			scoreChanged = false;
+		}
 
 		elapsed = clock.restart();
 		
@@ -294,7 +285,7 @@ void ServerGame::run()
 	enet_deinitialize();
 }
 
-void ServerGame::updateState()
+void ServerGame::updateState(MessageData& msgData)
 {
 	float distance;
 	bool death = false;
@@ -328,6 +319,10 @@ void ServerGame::updateState()
 
 			printf(" Player ID:%d has fallen out of the arena!\n", player->getId());
 			printf(" Current score:\n Player 1: %d\n Player 2: %d\n\n", score.player1, score.player2);
+
+			sprintf_s(msgData.message, "Player ID:%d has fallen out of the arena!\nCurrent score:\n Player 1: %d\n Player 2: %d\n\n",
+				player->getId(), score.player1, score.player2);
+			scoreChanged = true;
 		}
 
 		if (!death) // Don't check spear collision if the other player is already out of range and dead.
@@ -360,14 +355,19 @@ void ServerGame::updateState()
 
 				printf(" Player ID:%d impaled his foe!\n", player->getId());
 				printf(" Current score:\n Player 1: %d\n Player 2: %d\n\n", score.player1, score.player2);
+
+				sprintf_s(msgData.message, "Player ID:%d impaled his foe!\nCurrent score:\n Player 1: %d\n Player 2: %d\n\n",
+					player->getId(), score.player1, score.player2);
+				scoreChanged = true;
 			}
 		}
 	}
 
 	if (death)
-	{
+	{	
 		reset();
 	}
+
 }
 
 bool ServerGame::createPlayer()
@@ -394,10 +394,12 @@ void ServerGame::reset()
 		if (playerContainer[i]->getId() == 0)
 		{
 			playerContainer[i]->getShape().setPosition(screenX*.25f, screenY / 2);
+			playerContainer[i]->getShape().setRotation(0);
 		}
 		else
 		{
 			playerContainer[i]->getShape().setPosition(screenX*.75f, screenY / 2);
+			playerContainer[i]->getShape().setRotation(180);
 		}
 	}
 }

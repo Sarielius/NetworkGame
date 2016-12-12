@@ -13,28 +13,26 @@ Player::Player(int playerNumber) : id(playerNumber), attacking(false), canAttack
 
 	if (id == 0)
 	{
-		if (!tex.loadFromFile("../Assets/blueplayer2.png"))
+		/*if (!tex.loadFromFile("../Assets/blueplayer2.png"))
 		{
 			printf("Failed to load player texture! Player ID: %d", id);
 			return;
 		}
 
-		shape.setTexture(&tex);
-
-		/*sprite.setTexture(tex);
-		sprite.setOrigin(tex.getSize().x / 2, tex.getSize().y / 2);*/
+		shape.setTexture(&tex);*/
+		shape.setFillColor(sf::Color::Blue);
 
 	}
 	else
 	{
-		if (!tex.loadFromFile("../Assets/redplayer2.png"))
+		/*if (!tex.loadFromFile("../Assets/redplayer2.png"))
 		{
 			printf("Failed to load player texture! Player ID: %d", id);
 			return;
 		}
-		/*sprite.setTexture(tex);
-		sprite.setOrigin(tex.getSize().x / 2, tex.getSize().y / 2);*/
-		shape.setTexture(&tex);
+		
+		shape.setTexture(&tex);*/
+		shape.setFillColor(sf::Color::Red);
 		shape.setRotation(180.f);
 	}
 
@@ -127,10 +125,10 @@ void Player::update(const sf::Time& elapsed) // Packet struct reference for this
 
 void Player::draw(sf::RenderWindow& win)
 {
-	win.draw(weaponSprite);
+	//win.draw(weaponSprite);
 	win.draw(shape);
 	
-	//win.draw(weaponShape);
+	win.draw(weaponShape);
 	win.draw(debugShape);
 
 }
