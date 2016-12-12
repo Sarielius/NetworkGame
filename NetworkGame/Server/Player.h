@@ -30,6 +30,11 @@ public:
 	{
 		attacking = state;
 	}
+	
+	bool isAttacking()
+	{
+		return attacking;
+	}
 
 	bool playerCanAttack()
 	{

@@ -56,10 +56,10 @@ void ClientGame::run()
 
 	NetworkInfo netInfo;
 
-	printf("Enter IP:\n> ");
-	gets_s(netInfo.IP);
+	/*printf("Enter IP:\n> ");
+	gets_s(netInfo.IP);*/
 	
-	//sprintf_s(IPaddress, "127.0.0.1");
+	sprintf_s(netInfo.IP, "127.0.0.1");
 
 	if (enet_initialize() != 0)
 	{

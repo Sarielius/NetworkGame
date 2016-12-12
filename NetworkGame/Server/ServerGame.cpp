@@ -304,7 +304,6 @@ void ServerGame::updateState()
 	sf::Vector2f otherPos;
 
 	
-
 	for (auto &player : playerContainer)
 	{
 		playerPos = player->getShape().getPosition();
@@ -346,7 +345,6 @@ void ServerGame::updateState()
 			distance = sqrt((spearPos.x - otherPos.x) * (spearPos.x - otherPos.x) +
 				(spearPos.y - otherPos.y) * (spearPos.y - otherPos.y));
 
-
 			if (distance < player->getShape().getRadius())
 			{
 				death = true;
@@ -364,7 +362,6 @@ void ServerGame::updateState()
 				printf(" Current score:\n Player 1: %d\n Player 2: %d\n\n", score.player1, score.player2);
 			}
 		}
-		
 	}
 
 	if (death)
@@ -464,15 +461,50 @@ void ServerGame::updateNetworkData(PlayerData& pData, ServerData& sData, const s
 				sData.p2Attk = 1;
 			}	
 		}
+	}
+
+	if (pData.id == 0)
+	{
+		if (player1->isAttacking())
+		{
+			sData.p1Attk = 1;
+		}
 		else
 		{
-			if (pData.id == 0)
+			sData.p1Attk = 0;
+		}
+		if (player2 != nullptr)
+		{
+			if (player2->isAttacking())
 			{
-				sData.p1Attk = 0;
+				sData.p2Attk = 1;
 			}
 			else
 			{
 				sData.p2Attk = 0;
+			}
+		}
+	}
+	else
+	{
+		if (player1->isAttacking())
+		{
+			sData.p2Attk = 1;
+		}
+		else
+		{
+			sData.p2Attk = 0;
+		}
+
+		if (player2 != nullptr)
+		{
+			if (player2->isAttacking())
+			{
+				sData.p1Attk = 1;
+			}
+			else
+			{
+				sData.p1Attk = 0;
 			}
 		}
 	}
