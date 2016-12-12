@@ -193,13 +193,6 @@ void ServerGame::run()
 				break;
 
 			case ENET_EVENT_TYPE_RECEIVE:
-				/*printf("A packet of length %u containing %s was received from %s on channel %u.\n",
-					event.packet->dataLength,
-					event.packet->data,
-					event.peer->data,
-					event.channelID);
-				*/
-				
 				memcpy(&playerData, event.packet->data, event.packet->dataLength);
 				updateNetworkData(playerData, serverData, elapsed);
 

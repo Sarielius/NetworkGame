@@ -46,7 +46,6 @@ struct MessageData
 void ClientGame::run()
 {	
 	bool running = true;
-	char IPaddress[25];
 
 	PlayerData outboundData;
 	
@@ -67,22 +66,6 @@ void ClientGame::run()
 	}
 	
 	initDone = initialize(netInfo);
-
-	//ENetHost* client;
-	//client = enet_host_create(NULL, 1, 2, 0, 0);
-	//ENetAddress address;
-	//ENetPeer* server;
-	//
-	//enet_address_set_host(&address, IPaddress);
-	//address.port = 2302;
-
-	//server = enet_host_connect(client, &address, 2, 0);
-
-	//if (server == nullptr)
-	//{
-	//	printf("\nNo available peers for initiating an ENet connection.\n");
-	//	//running = false;
-	//}
 
 	// SFML
 
@@ -132,13 +115,6 @@ void ClientGame::run()
 			{
 				switch (event.type)
 				{
-				//case ENET_EVENT_TYPE_CONNECT:
-				//	printf("\nConnected to server in location %s:%u.\n",
-				//		IPaddress,
-				//		event.peer->address.port);
-				//	/* Store any relevant server information here. */
-				//	event.peer->data = "Server information";
-				//	break;
 				case ENET_EVENT_TYPE_RECEIVE:
 
 					type = *event.packet->data;
@@ -147,24 +123,7 @@ void ClientGame::run()
 
 					switch (type)
 					{
-					//case PacketType::INIT:
-					//	//printf("Type: INIT\n");
-					//	memcpy(&initData, event.packet->data, event.packet->dataLength);
-
-					//	player->setID(initData.id);
-
-					//	if (initData.id == 0)
-					//	{
-					//		enemy->setID(1);
-					//	}
-					//	else
-					//	{
-					//		enemy->setID(0);
-					//	}
-
-					//	printf("My ID:%d\n", player->getID());
-
-					//	break;
+					
 					case PacketType::DATA:
 						//printf("Type: DATA\n");
 						memcpy(&serverData, event.packet->data, event.packet->dataLength);

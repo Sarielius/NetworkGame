@@ -133,8 +133,3 @@ void Player::draw(sf::RenderWindow& win)
 
 }
 
-//void Player::setPosition(const sf::Vector2f& pos)
-//{
-//	shape.setPosition(pos);
-//}
-
