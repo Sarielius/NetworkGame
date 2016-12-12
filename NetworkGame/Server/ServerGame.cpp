@@ -119,7 +119,7 @@ void ServerGame::run()
 
 	// Rendering stuff
 
-	sf::RenderWindow window(sf::VideoMode(screenX, screenY), "NetworkGame");
+	sf::RenderWindow window(sf::VideoMode(screenX, screenY), "Gladiator SERVER");
 	window.setFramerateLimit(60);
 	sf::Clock clock;
 	sf::Time elapsed = clock.getElapsedTime();

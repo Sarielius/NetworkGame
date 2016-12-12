@@ -69,7 +69,7 @@ void ClientGame::run()
 
 	// SFML
 
-	sf::RenderWindow window(sf::VideoMode(screenX, screenY), "NetworkGame");
+	sf::RenderWindow window(sf::VideoMode(screenX, screenY), "Gladiator CLIENT");
 	window.setFramerateLimit(60);
 	sf::Clock clock;
 	sf::Time elapsed = clock.getElapsedTime();
